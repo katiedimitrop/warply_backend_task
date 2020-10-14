@@ -57,7 +57,7 @@ class Bitmap(RequestHandler):
         self.write({'message': 'BitMap with id %s does not exist' % id})
 
 class Union(RequestHandler): 
-  def post(self, _):
+  def post(self):
      global bitmaps_metadata
      json_data = json.loads(self.request.body)
      pairs = json_data.items()
@@ -75,7 +75,30 @@ class Union(RequestHandler):
      self.write({  'Bitmap ids' : ids })
      self.write({  'Bitmap union ': bm_union.to_array().tolist() })
         
+class Intersection(RequestHandler): 
+  def post(self):
+     global bitmaps_metadata
+     json_data = json.loads(self.request.body)
+     pairs = json_data.items()
+     ids = []
+     #isolate ids of bitmaps for intersection
+     for key, value in pairs:
+        ids.append(value)
+                 
 
+     #calculate intersection of all specified bitmaps
+     bm_intersection = BitMap()
+     
+     for previous, current in zip(ids, ids[1:]):
+        previous_bm = BitMap(bitmaps_metadata[previous]["set"])
+        current_bm = BitMap(bitmaps_metadata[current]["set"])
+        if len(bm_intersection.to_array().tolist()) == 0:
+            bm_intersection = BitMap.intersection(previous_bm,current_bm)
+        else:
+            bm_intersection = BitMap.intersection(bm_intersection,previous_bm,current_bm)
+
+     self.write({  'Bitmap ids' : ids })
+     self.write({  'Bitmap intersection ': bm_intersection.to_array().tolist() })
 
 
 def make_app():
@@ -83,7 +106,8 @@ def make_app():
   urls = [
     ("/", Bitmaps),
     (r"/api/bitmap/([^/]+)?", Bitmap),
-    (r"/api/union/([^/]+)?", Union)
+    (r"/api/union/", Union),
+    (r"/api/intersection/", Intersection)
   ]
   return Application(urls, debug=True)
   
