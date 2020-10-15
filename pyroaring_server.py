@@ -3,7 +3,7 @@ from tornado.ioloop import IOLoop
 import tornado
 from pyroaring import BitMap
 import json
-
+import re
 #my own classes
 import settings
 from bitmap import Bitmap
@@ -33,15 +33,19 @@ class BaseHandler(RequestHandler):
 class MainHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
-        username = tornado.escape.xhtml_escape(self.current_user)
-        self.write("Hello, " + username)
+        name = tornado.escape.xhtml_escape(self.current_user)
+        self.write("Hello, " + name)
 
 class LoginHandler(BaseHandler):
 
     def get(self):
-        self.write("Log in with a username at http://localhost:3000/api/login")
+        self.write('<html><body><form action="/login" method="post">'
+                   'Name: <input type="text" name="name">'
+                   '<input type="submit" value="Sign in">'
+                   '</form></body></html>'
+                    'Log in with a name at http://localhost:3000/api/login')
     def post(self):
-        self.set_secure_cookie("user", json.loads(self.request.body)["username"])
+        self.set_secure_cookie("user", json.loads(self.request.body)["name"])
         self.redirect("/")
 
 
@@ -55,15 +59,15 @@ def make_app():
   urls = [
      
     (r"/", MainHandler),
-    (r"/api/bitmaps", Bitmaps),
+    (r"/api/bitmaps/?", Bitmaps),
     (r"/api/bitmap/([^/]+)?", Bitmap),
-    (r"/api/union/", Union),
-    (r"/api/intersection/", Intersection),
-    (r'/api/login', LoginHandler),
-    (r'/api/logout', LogoutHandler)
+    (r"/api/union/?", Union),
+    (r"/api/intersection/?", Intersection),
+    (r'/api/login/?', LoginHandler),
+    (r'/api/logout/?', LogoutHandler)
   ]
   return Application(urls, debug=True,xsrf_cookies= False, cookie_secret= "bZJc2sWbQLKos6GkHn/VB9oXwQt8S0R0kRvJ5/xJ89E=",
-            login_url= "/login")
+            login_url= "/api/login/?")
   
 if __name__ == '__main__':
   app = make_app()
