@@ -21,7 +21,7 @@ class Bitmap(RequestHandler):
     json_data = json.loads(self.request.body)
     json_data["username"] = user
     json_data["id"] = len(bitmaps_metadata)
-   #remove duplicates
+  #remove duplicates
     json_data["set"] = sorted(list(set(json_data["set"])))
     settings.bitmaps_metadata.append(json_data)
     #bm = BitMap(bitmaps_metadata[0]["set"])
@@ -53,8 +53,3 @@ class Bitmap(RequestHandler):
                 self.write({'message': 'BitMap with id %s was updated' % id})
     else:
         self.write({'message': 'BitMap with id %s does not exist' % id})
-
-#class CookieHandler(BaseHandler):
-    #def get_current_user(self):
-        
-        #return self.get_secure_cookie("user")

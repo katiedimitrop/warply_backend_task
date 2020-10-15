@@ -45,7 +45,10 @@ class LoginHandler(BaseHandler):
                    '</form></body></html>'
                     'Log in with a name at http://localhost:3000/api/login')
     def post(self):
-        self.set_secure_cookie("user", json.loads(self.request.body)["name"])
+        
+        given_name = json.loads(self.request.body)["name"] 
+        self.set_secure_cookie("user",given_name )
+        #print("%r %s " % (self.request, self.request.body.decode()))
         self.redirect("/")
 
 
@@ -66,10 +69,11 @@ def make_app():
     (r'/api/login/?', LoginHandler),
     (r'/api/logout/?', LogoutHandler)
   ]
+ 
   return Application(urls, debug=True,xsrf_cookies= False, cookie_secret= "bZJc2sWbQLKos6GkHn/VB9oXwQt8S0R0kRvJ5/xJ89E=",
             login_url= "/api/login/?")
   
 if __name__ == '__main__':
-  app = make_app()
-  app.listen(3000)
+  settings.app = make_app()
+  settings.app.listen(3000)
   IOLoop.instance().start()
