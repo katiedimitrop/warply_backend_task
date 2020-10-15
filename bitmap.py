@@ -1,9 +1,10 @@
-from tornado.web import Application, RequestHandler
+from tornado.web import *
 import settings
 import json
 from pyroaring import BitMap
 
 class Bitmap(RequestHandler):
+  @tornado.web.authenticated
   def get(self,id):
     bitmaps_metadata = settings.bitmaps_metadata
     if len(bitmaps_metadata) > int(id):
@@ -11,6 +12,7 @@ class Bitmap(RequestHandler):
     else:
         self.write({'message': 'BitMap with id %s does not exist' % id})
 
+  @tornado.web.authenticated
   def post(self, _):
     bitmaps_metadata = settings.bitmaps_metadata
     #on post request create a bitmap and add to collection
@@ -23,6 +25,7 @@ class Bitmap(RequestHandler):
     #print(bm.to_array().tolist())
     self.write({'message': 'new Bitmap with id %s added' % str(len(bitmaps_metadata)-1)})
 
+  @tornado.web.authenticated
   def delete(self, id):
     #keyword necessary to access global items
     bitmaps_metadata = settings.bitmaps_metadata
@@ -36,6 +39,7 @@ class Bitmap(RequestHandler):
     else:
         self.write({'message': 'BitMap with id %s does not exist' % id})
 
+  @tornado.web.authenticated
   def put(self, id):
   #keyword necessary to access global items
     bitmaps_metadata = settings.bitmaps_metadata
