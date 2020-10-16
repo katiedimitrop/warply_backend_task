@@ -9,7 +9,9 @@ import settings
 from bitmap import Bitmap
 from operations.intersection import Intersection
 from operations.union import Union
-
+from operations.missing import Missing
+import datetime
+import csv
 settings.init()          # Call only once
 #collection of all user-created bitmaps since server initialization
 bitmaps_metadata = settings.bitmaps_metadata
@@ -54,6 +56,19 @@ class LoginHandler(BaseHandler):
 
 class LogoutHandler(BaseHandler):
     def get(self):
+        user = str(self.get_secure_cookie("user"), 'utf-8')
+        now = datetime.datetime.now()
+        #print ("Current date and time : ")
+        #print (now.strftime("%Y-%m-%d %H:%M:%S"))
+        #print("LOGGED OUT USER %s" % user)
+
+        
+        with open('session_logs.csv', 'a', newline='') as file:
+            file_writer = csv.writer(file, delimiter=',',
+                quotechar = "'")
+            file_writer.writerow([ user, now.strftime('\"%Y-%m-%d %H:%M:%S\"') ])
+
+        
         self.clear_cookie("user")
         self.redirect("/")
 
@@ -67,7 +82,8 @@ def make_app():
     (r"/api/union/?", Union),
     (r"/api/intersection/?", Intersection),
     (r'/api/login/?', LoginHandler),
-    (r'/api/logout/?', LogoutHandler)
+    (r'/api/logout/?', LogoutHandler),
+    (r'/api/noOfMissingUsers/([^/]+)?', Missing)
   ]
  
   return Application(urls, debug=True,xsrf_cookies= False, cookie_secret= "bZJc2sWbQLKos6GkHn/VB9oXwQt8S0R0kRvJ5/xJ89E=",
@@ -77,3 +93,4 @@ if __name__ == '__main__':
   settings.app = make_app()
   settings.app.listen(3000)
   IOLoop.instance().start()
+   
