@@ -6,7 +6,7 @@ import csv
 import datetime
 class Missing(RequestHandler): 
   def get(self,days):
-     with open('session_logs.csv', 'r', newline='') as file:
+     with open('data/session_logs.csv', 'r', newline='') as file:
         file_reader = csv.reader(file, delimiter=',')
         reader = csv.reader(file)
         missing_counter = 0

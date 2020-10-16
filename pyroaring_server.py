@@ -49,11 +49,11 @@ class MainHandler(BaseHandler):
 class LoginHandler(BaseHandler):
 
     def get(self):
-        self.write('<html><body><form action="/login" method="post">'
+        self.write('<html><body><form action="/api/login/" method="post">'
                    'Name: <input type="text" name="name">'
                    '<input type="submit" value="Sign in">'
                    '</form></body></html>'
-                    'Log in with a name at http://localhost:3000/api/login')
+                    'Log in with a name at http://localhost:3000/api/login/')
     def post(self):
         
         given_name = json.loads(self.request.body)["name"] 
@@ -78,11 +78,11 @@ class LoginHandler(BaseHandler):
 
             #update csv with new user 
 
-            with open('users.csv', 'a', newline='') as file:
+            with open('data/users.csv', 'a', newline='') as file:
                 file_writer = csv.writer(file,quotechar = "'")             
                 file_writer.writerow(['\"'+given_name+'\"'])
 
-            with open('user_tags.csv', 'a', newline='') as file:
+            with open('data/user_tags.csv', 'a', newline='') as file:
                 file_writer = csv.writer(file,delimiter=",",quotechar = "'")
                 print(userTagList) 
                 file_writer.writerow(userTagList)
@@ -99,7 +99,7 @@ class LogoutHandler(BaseHandler):
         #print("LOGGED OUT USER %s" % user)
 
         
-        with open('session_logs.csv', 'a', newline='') as file:
+        with open('data/session_logs.csv', 'a', newline='') as file:
             file_writer = csv.writer(file, delimiter=',',quotechar = "'")
             file_writer.writerow([ user, now.strftime('\"%Y-%m-%d %H:%M:%S\"') ])
 
@@ -135,7 +135,7 @@ def make_app():
     (r"/api/bitmap/([^/]+)?", Bitmap),
     (r"/api/union/?", Union),
     (r"/api/intersection/?", Intersection),
-    (r'/api/login/?', LoginHandler),
+    (r'/api/login/', LoginHandler),
     (r'/api/logout/?', LogoutHandler),
     (r'/api/noOfMissingUsers/([^/]+)?', Missing),
     (r'/api/noOfUsersWithTags/?', NoOfUsersWithTags),
@@ -145,13 +145,13 @@ def make_app():
   #read users and their tags from csv
 
 
-  with open('users.csv', mode='r', encoding='utf-8-sig') as file:
+  with open('data/users.csv', mode='r', encoding='utf-8-sig') as file:
         file_reader = csv.reader(file)
         for row in file_reader:
             users.append(row)
 
             
-  with open('user_tags.csv', mode='r', encoding='utf-8-sig') as file:
+  with open('data/user_tags.csv', mode='r', encoding='utf-8-sig') as file:
         file_reader = csv.reader(file)
         for row in file_reader:
             temp_tag_list = []
@@ -161,7 +161,7 @@ def make_app():
   
   
   return Application(urls, debug=True,xsrf_cookies= False, cookie_secret= "bZJc2sWbQLKos6GkHn/VB9oXwQt8S0R0kRvJ5/xJ89E=",
-            login_url= "/api/login/?")
+            login_url= "/api/login/")
   
 if __name__ == '__main__':
   settings.app = make_app()
